@@ -69,6 +69,10 @@ void up_initialize(void)
   up_enable_dcache();
 #endif
 
+#if CONFIG_MM_REGIONS > 1
+  tricore_addregion();
+#endif
+
   /* Initialize the serial device driver */
 
 #ifdef USE_SERIALDRIVER
