@@ -71,7 +71,7 @@ static inline void tricore_color_intstack(void)
  * Private Data
  ****************************************************************************/
 
-static int g_srpn_to_irq[TRICORE_IRQ_MAX_PRIORITY + 1];
+static irq_t g_srpn_to_irq[TRICORE_IRQ_MAX_PRIORITY + 1];
 static spinlock_t g_irqlock = SP_UNLOCKED;
 
 /****************************************************************************
