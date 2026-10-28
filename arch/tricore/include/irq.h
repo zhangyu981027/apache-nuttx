@@ -348,6 +348,8 @@ noinstrument_function static inline_function irqstate_t up_irq_save(void)
       tricore_mtcr(TRICORE_CPU_ICR, icr);
       UP_ISB();
     }
+#elif defined(CONFIG_TRICORE_TOOLCHAIN_TASKING)
+  flags = __disable_and_save();
 #else
   __asm__ __volatile__ ("disable %0" : "=d"(flags) :: "memory");
 #endif
@@ -378,6 +380,8 @@ void up_irq_restore(irqstate_t flags)
       tricore_mtcr(TRICORE_CPU_ICR, icr);
       UP_ISB();
     }
+#elif defined(CONFIG_TRICORE_TOOLCHAIN_TASKING)
+  __restore(flags);
 #else
   __asm__ __volatile__ ("restore %0" :: "d"(flags) : "memory");
 #endif

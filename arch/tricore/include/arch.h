@@ -84,19 +84,25 @@
     })
 #endif
 
-/* MTCR and MFCR - move to / from Core Special Function Register */
+/* TASKING mis-compiles output-only volatile mfcr asm; use its builtins. */
 
-#define tricore_mtcr(reg, val)                                             \
-  ({                                                                       \
-    __asm__ __volatile__ ("mtcr %0,%1\n\t"::"i"(reg),"d"(val):"memory");   \
-  })
+#ifdef CONFIG_TRICORE_TOOLCHAIN_TASKING
+#  define tricore_mtcr(reg, val) __mtcr((reg), (val))
+#  define tricore_mfcr(reg)      (__mfcr(reg))
+#else
+#  define tricore_mtcr(reg, val)                                           \
+    ({                                                                     \
+      __asm__ __volatile__ ("mtcr %0,%1\n\t"::"i"(reg),"d"(val):"memory"); \
+    })
 
-#define tricore_mfcr(reg)                                                  \
-  ({                                                                       \
-    uint32_t __val;                                                        \
-    __asm__ __volatile__ ("mfcr %0,%1": "=d" (__val) :"i"(reg): "memory"); \
-    __val;                                                                 \
-  })
+#  define tricore_mfcr(reg)                                                \
+    ({                                                                     \
+      uint32_t __val;                                                      \
+      __asm__ __volatile__ ("mfcr %0,%1": "=d" (__val) :"i"(reg):         \
+                            "memory");                                     \
+      __val;                                                               \
+    })
+#endif
 
 /* Return from a handler that the trap or interrupt vector entered with
  * jli, to the vector code at A11.
