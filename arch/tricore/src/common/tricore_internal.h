@@ -149,14 +149,11 @@ typedef void (*up_vector_t)(void);
  */
 
 extern uintptr_t        __ustack[];
-#define g_idle_topstack __ustack
 
 /* Address of the saved user stack pointer */
 
 #if CONFIG_ARCH_INTERRUPTSTACK > 3
 extern uintptr_t        __istack[];
-#define g_intstackalloc ((uintptr_t)__istack - CONFIG_ARCH_INTERRUPTSTACK)
-#define g_intstacktop   __istack
 #endif
 
 /* These symbols are setup by the linker script. */

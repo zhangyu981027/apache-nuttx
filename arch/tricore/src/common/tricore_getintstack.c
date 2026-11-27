@@ -28,7 +28,79 @@
 
 #include <stdint.h>
 
+#include <nuttx/sched.h>
+
 #include "tricore_internal.h"
+
+/****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
+
+#ifdef CONFIG_UP
+#  define g_idle_topstack __ustack
+#  define g_intstackalloc ((uintptr_t)__istack - CONFIG_ARCH_INTERRUPTSTACK)
+#endif
+
+/****************************************************************************
+ * Private Data
+ ****************************************************************************/
+
+#ifndef CONFIG_UP
+extern uintptr_t __ustack0[];
+extern uintptr_t __ustack1[];
+extern uintptr_t __ustack2[];
+extern uintptr_t __ustack3[];
+extern uintptr_t __ustack4[];
+extern uintptr_t __ustack5[];
+extern uintptr_t __istack0[];
+extern uintptr_t __istack1[];
+extern uintptr_t __istack2[];
+extern uintptr_t __istack3[];
+extern uintptr_t __istack4[];
+extern uintptr_t __istack5[];
+
+static uintptr_t g_idle_topstack[CONFIG_NCPUS] =
+{
+  [0] = (uintptr_t)__ustack0,
+#if CONFIG_NCPUS > 1
+  [1] = (uintptr_t)__ustack1,
+#if CONFIG_NCPUS > 2
+  [2] = (uintptr_t)__ustack2,
+#if CONFIG_NCPUS > 3
+  [3] = (uintptr_t)__ustack3,
+#if CONFIG_NCPUS > 4
+  [4] = (uintptr_t)__ustack4,
+#if CONFIG_NCPUS > 5
+  [5] = (uintptr_t)__ustack5,
+#endif
+#endif
+#endif
+#endif
+#endif
+};
+
+#if CONFIG_ARCH_INTERRUPTSTACK > 3
+static uintptr_t g_int_topstack[CONFIG_NCPUS] =
+{
+  [0] = (uintptr_t)__istack0,
+#if CONFIG_NCPUS > 1
+  [1] = (uintptr_t)__istack1,
+#if CONFIG_NCPUS > 2
+  [2] = (uintptr_t)__istack2,
+#if CONFIG_NCPUS > 3
+  [3] = (uintptr_t)__istack3,
+#if CONFIG_NCPUS > 4
+  [4] = (uintptr_t)__istack4,
+#if CONFIG_NCPUS > 5
+  [5] = (uintptr_t)__istack5,
+#endif
+#endif
+#endif
+#endif
+#endif
+};
+#endif
+#endif
 
 /****************************************************************************
  * Public Functions
@@ -41,6 +113,28 @@
 #if CONFIG_ARCH_INTERRUPTSTACK > 3
 uintptr_t up_get_intstackbase(int cpu)
 {
-  return (uintptr_t)g_intstackalloc;
+#ifndef CONFIG_UP
+  return g_int_topstack[cpu] - CONFIG_ARCH_INTERRUPTSTACK;
+#else
+  return g_intstackalloc;
+#endif
 }
 #endif
+
+/****************************************************************************
+ * Name: up_cpu_idlestack
+ ****************************************************************************/
+
+int up_cpu_idlestack(int cpu, struct tcb_s *tcb, size_t stack_size)
+{
+#ifndef CONFIG_UP
+  uintptr_t topstack = g_idle_topstack[cpu];
+#else
+  uintptr_t topstack = (uintptr_t)g_idle_topstack;
+#endif
+
+  tcb->stack_alloc_ptr = (void *)(topstack - stack_size);
+  tcb->stack_base_ptr  = tcb->stack_alloc_ptr;
+  tcb->adj_stack_size  = stack_size;
+  return 0;
+}
