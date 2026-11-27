@@ -87,7 +87,7 @@
 /* TASKING mis-compiles output-only volatile mfcr asm; use its builtins. */
 
 #ifdef CONFIG_TRICORE_TOOLCHAIN_TASKING
-#  define tricore_mtcr(reg, val) __mtcr((reg), (val))
+#  define tricore_mtcr(reg, val) __mtcr((reg), (int)(uintptr_t)(val))
 #  define tricore_mfcr(reg)      (__mfcr(reg))
 #else
 #  define tricore_mtcr(reg, val)                                           \
