@@ -92,6 +92,10 @@ if(CONFIG_LIBC_ARCH_STPCPY)
   list(APPEND SRCS ${TRICORE_SUBDIR}/arch_stpcpy.${ASMEXT})
 endif()
 
+if(CONFIG_TRICORE_TOOLCHAIN_TASKING)
+  list(APPEND SRCS tricore_cxx_initialize.c)
+endif()
+
 target_include_directories(c PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 
 target_sources(c PRIVATE ${SRCS})

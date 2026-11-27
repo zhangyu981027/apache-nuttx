@@ -92,6 +92,10 @@ ifeq ($(CONFIG_LIBC_ARCH_STPCPY),y)
 ASRCS += arch_stpcpy$(ASMEXT)
 endif
 
+ifeq ($(CONFIG_TRICORE_TOOLCHAIN_TASKING),y)
+CSRCS += tricore_cxx_initialize.c
+endif
+
 DEPPATH += --dep-path machine/tricore/$(TRICORE_SUBDIR)
 DEPPATH += --dep-path machine/tricore
 VPATH += :machine/tricore/$(TRICORE_SUBDIR)
